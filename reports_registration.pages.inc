@@ -74,7 +74,6 @@ function course_detail()
     $term = htmlentities($_POST['crs_term']);
     $start = htmlentities($_POST['start_date']);
     $end = htmlentities($_POST['end_date']);
-    /*$title = $crs_name . "-" . $crs_section . "-" . $crs_crn . "-" . $term . "-" . $crs_instructor . "-" . date('Y-m-d H:i:s');*/
 
     // Converting DateTime to UnixTime
     $startUnix = new DateTime($start);
@@ -116,8 +115,7 @@ function course_detail()
         ->addTag('node_access')
         ->orderBy('s.last_name');
     $result->join('users', 'u', 's.onid = u.name');
-    /*$result->extend('TableSort')
-        ->orderByHeader($header); //then use an extender to create the sorted table*/
+
 
     // storing results of query in results
     $results = $result->execute();
@@ -253,7 +251,7 @@ function student_detail()
     $studentInfo = $result->execute()->fetchAll();
 
     foreach ($studentInfo as $student) {
-        $build .='<h2 class="report-title">Student Information</h2>';
+        $build .='<p class="report-title">Student Information</p>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $student->last_name . '</p></div>'
@@ -319,7 +317,7 @@ function student_detail()
 
 
     // Displaying Post Statistics
-    $build .='<h2 class="report-title">Student Post Statistics</h2>';
+    $build .='<p class="report-title">Student Post Statistics</p>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal. '</p></div>'

@@ -221,6 +221,3 @@ function reports_registration_user_login(&$edit, $account)
     }
     return;
 }
-
-
-
