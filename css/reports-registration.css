@@ -9,3 +9,10 @@ h2.report-title{
     border-bottom: 2px solid #CB5C20;
 
 }
+
+p.report-title{
+    border-bottom: 2px solid #CB5C20;
+    color: #CB5C20;
+    font-size: 1.3em;
+
+}
