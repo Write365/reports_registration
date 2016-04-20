@@ -61,6 +61,11 @@ var TACAL = function (args) {
      }*/
 };
 
+/**
+ * Hold a single day information
+ * @param args
+ * @constructor
+ */
 var DAY = function (args) {
 
     // Hold the date id
@@ -147,6 +152,8 @@ TACAL.prototype.init = function () {
  * Goes to the next month
  */
 TACAL.prototype.nextMonth = function () {
+
+    // Determines if date need to roll over
     if (this.currMonth == 11) {
         this.currMonth = 0;
         this.currYear = this.currYear + 1;
@@ -154,11 +161,21 @@ TACAL.prototype.nextMonth = function () {
     else {
         this.currMonth = this.currMonth + 1;
     }
+
+    // Gets then number of weeks in the new month
     this.currWeeks = this.getWeeksInMonth();
+
+    // Initialize the new calender
     this.calendar = this.init();
+
+    // Adds dates to the calender
     this.addDate(this.currYear, this.currMonth);
+
+    // Adds events to the calender
     this.addEvent();
-    this.showcurr();
+
+    // displays the calender
+    this.fullMonth();
 
 };
 
@@ -166,6 +183,8 @@ TACAL.prototype.nextMonth = function () {
  * Goes to the previous month
  */
 TACAL.prototype.previousMonth = function () {
+
+    // Determines if date need to roll over
     if (this.currMonth == 0) {
         this.currMonth = 11;
         this.currYear = this.currYear - 1;
@@ -173,19 +192,28 @@ TACAL.prototype.previousMonth = function () {
     else {
         this.currMonth = this.currMonth - 1;
     }
+    // Gets then number of weeks in the new month
     this.currWeeks = this.getWeeksInMonth();
+
+    // Initialize the new calender
     this.calendar = this.init();
+
+    // Adds dates to the calender
     this.addDate(this.currYear, this.currMonth);
+
+    // Adds events to the calender
     this.addEvent();
-    this.showcurr();
+
+    // displays the calender
+    this.fullMonth();
 };
 
 /**
- * Show current month
+ * Show full Month
  */
-TACAL.prototype.showcurr = function () {
-    //this.showMonth(this.currYear, this.currMonth);
-    this.showMonth();
+TACAL.prototype.fullMonth = function () {
+    //this.showFullMonth(this.currYear, this.currMonth);
+    this.showFullMonth();
     var cal = this;
     getId(this.id + 'Next').onclick = function () {
         cal.nextMonth();
@@ -198,14 +226,12 @@ TACAL.prototype.showcurr = function () {
 /**
  * Displays the calendar with the selected months days
  */
-TACAL.prototype.showMonth = function () {
+TACAL.prototype.showFullMonth = function () {
+
     // --> Start calendar wrapper
-    html = '';
+    var html = '';
     html += '<div class="calendar-wrapper">';
 
-    /*html += '<button id="' + this.id + 'Prev" class="btnPrev" type="button">Prev</button>';
-    html += '<button id="' + this.id + 'Next" class="btnNext" type="button">Next</button>';
-    html += '<div>';*/
 
     // --> Start table
     html += '<table>';
@@ -245,12 +271,194 @@ TACAL.prototype.showMonth = function () {
         html += '<tr>';
         for (var col = 0; col < this.calendar[row].length; col++) {
 
-            // Render date based on storeded information.
-            html += this.renderDate(this.calendar[row][col]);
+            // Render date based on stored information.
+            html += this.renderDate(this.calendar[row][col], 1);
         }
+
+    }
+
+
+    html += '</tr>';
+    // <-- End table row
+    html += '</tbody>';
+    // <-- End body
+
+    html += '</table>';
+    // <-- End table
+
+    html += '</div>';
+    // <-- End calendar wrapper
+
+    // Write HTML to the div
+    document.getElementById(this.id).innerHTML = html;
+};
+
+/**
+ * Displays the number of number of months in a linear view
+ * @param numMonths
+ */
+TACAL.prototype.linearMonth = function (begin, end) {
+    var monthsCal = [];
+    var count = 0;
+    var ms = {
+        month: null,
+        year: null,
+        calendar: null
+    };
+
+    if(begin == null && end == null){
+
+        ms = {
+            month: this.currMonth,
+            year: this.currYear,
+            calendar: this.calendar
+        };
+        monthsCal[count]= ms;
+        this.showLinerMonth(monthsCal);
+        return;
+    }
+
+    if(begin.getFullYear() == end.getFullYear()){
+        for(var m = begin.getMonth(); m <= end.getMonth(); m++){
+
+            this.currMonth = m;
+            this.currYear = begin.getFullYear();
+
+            // Gets then number of weeks in the new month
+            this.currWeeks = this.getWeeksInMonth();
+
+            // Initialize the new calender
+            this.calendar = this.init();
+
+            // Adds dates to the calender
+            this.addDate(this.currYear, this.currMonth);
+
+            // Adds events to the calender
+            this.addEvent();
+
+            ms = {
+                month: m,
+                year: begin.getFullYear(),
+                calendar: this.calendar
+            };
+
+            monthsCal[count] = ms;
+            count++;
+        }
+        this.showLinerMonth(monthsCal);
+    }
+    else if (begin.getFullYear() < end.getFullYear()){
+        var m = begin.getMonth();
+        var year = begin.getFullYear();
+        var exit = false;
+        do{
+            this.currMonth = m;
+            this.currYear = year;
+
+            // Gets then number of weeks in the new month
+            this.currWeeks = this.getWeeksInMonth();
+
+            // Initialize the new calender
+            this.calendar = this.init();
+
+            // Adds dates to the calender
+            this.addDate(this.currYear, this.currMonth);
+
+            // Adds events to the calender
+            this.addEvent();
+
+            // Add calendar to container
+            ms = {
+                month: m,
+                year: year,
+                calendar: this.calendar
+            };
+            
+            // places contain in array
+            monthsCal[count] = ms;
+            count++;
+            
+            if(m == 11){
+                m = 0;
+                year++;
+            }
+            else{
+                m++;
+            }
+
+            if(year == end.getFullYear() && m == end.getMonth()){
+                exit = true;
+            }
+            
+            
+        }while( exit == false );
+        this.showLinerMonth(monthsCal);
+    }
+};
+
+/**
+ * Displays the calendar in a linear view
+ */
+TACAL.prototype.showLinerMonth = function (monthsCal) {
+
+    var html = '';
+
+    // --> Start calendar wrapper
+    html += '<div class="calendar-wrapper linear">';
+
+    // --> Start table
+    html += '<table>';
+
+    // --> Start header
+    html += '<thead>';
+
+    // --> Start row
+    html += '<tr>';
+
+    html += '<td>Month</td>';
+
+    for (var days = 1; days < 32; days++) {
+        html += '<td>' + days + '</td>';
+    }
+
+    html += '</tr>';
+    // <--  End row
+
+    html += '</theader>';
+    // <-- End header
+
+    // --> Start body
+    html += '<tbody>';
+
+    // --> Start table row
+    html += '<tr>';
+
+    // Showing the name of the month
+
+    for(var month = 0; month < monthsCal.length; month++) {
+        html += '<td>' + this.Months[monthsCal[month].month] + '</td>';
+        var numDays = 1;
+        for (var row = 0; row < monthsCal[month].calendar.length; row++) {
+            for (var col = 0; col < monthsCal[month].calendar[row].length; col++) {
+                if (monthsCal[month].calendar[row][col].current == true) {
+                    // Render date based on stored information.
+                    html += this.renderDate(monthsCal[month].calendar[row][col], 0);
+                    numDays++;
+                }
+            }
+        }
+
+        if (numDays < 32) {
+            for (var d = numDays; d < 32; d++) {
+                html += '<td class="not-current"></td>';
+            }
+        }
+
+
         html += '</tr>';
         // <-- End table row
     }
+
     html += '</tbody>';
     // <-- End body
 
@@ -294,20 +502,20 @@ TACAL.prototype.addDate = function (y, m) {
     // Previous month year
     var nextMonthYear = (( m + 1 > 11) ? y + 1 : y );
 
- /*   if(m == 1){
-        if(((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)){
-            numberOfDays == 28;
-        }
-        else{
-            numberOfDays == 29;
-        }
-    }*/
+    /*   if(m == 1){
+     if(((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)){
+     numberOfDays == 28;
+     }
+     else{
+     numberOfDays == 29;
+     }
+     }*/
     /*
      Filling dates of previous month
      if the first day of the selected month
      is not on Sunday.
      */
-    if (firstDayOfCurrentMonth != 0 ) {
+    if (firstDayOfCurrentMonth != 0) {
         var lastMonthsDates = lastDayOfPreviousMonth - firstDayOfCurrentMonth + 1;
         for (var i = 0; i < firstDayOfCurrentMonth; i++) {
             this.calendar[week][day] = new DAY({
@@ -385,14 +593,19 @@ TACAL.prototype.addEvent = function () {
 
 };
 
-TACAL.prototype.renderDate = function (date) {
+/**
+ * Render a given date with the correct information and events
+ * @param date
+ * @param show
+ * @returns {string}
+ */
+TACAL.prototype.renderDate = function (date, show) {
 
     var keys = Object.keys(date);
     var css = '';
     var id = date.id;
     var innerhtml = date.date;
     var event = '';
-
 
     // Applies css: not current month
     if (keys.indexOf("current") != -1) {
@@ -401,51 +614,48 @@ TACAL.prototype.renderDate = function (date) {
         }
     }
 
-    // Applies css: event on date
- /*   if (keys.indexOf("event") != -1) {
-        if (date[keys[keys.indexOf("event")]] != null) {
-            css += 'event '
-        }
-
-    }*/
-
     // check for an event on the day.
-    if(keys.indexOf('event') != -1 && date.event != null){
+    if (keys.indexOf('event') != -1 && date.event != null) {
 
         // Applies css: for wordcount of student post. 
-        if(date['event'].hasOwnProperty('wordcount')){
+        if (date['event'].hasOwnProperty('wordcount')) {
 
-            if(date['event'].wordcount < 349){
+            if (date['event'].wordcount < 349) {
                 event += '<div class="low">' + date['event'].wordcount + '</div>';
             }
-            else if(date['event'].wordcount >= 349 && date['event'].wordcount < 370 ){
+            else if (date['event'].wordcount >= 349 && date['event'].wordcount < 370) {
                 event += '<div class="medium">' + date['event'].wordcount + '</div>';
             }
-            else if(date['event'].wordcount >= 370){
+            else if (date['event'].wordcount >= 370) {
                 event += '<div class="high">' + date['event'].wordcount + '</div>';
             }
 
         }
 
         // Applies css: for is_wordsalad of a student post
-        if(date['event'].hasOwnProperty('is_wordsalad')){
-            if(date['event'].is_wordsalad == 1){
+        if (date['event'].hasOwnProperty('is_wordsalad')) {
+            if (date['event'].is_wordsalad == 1) {
                 event += '<div class="iswordsalad"></div>';
             }
-            else if(date['event'].is_wordsalad == 0){
+            else if (date['event'].is_wordsalad == 0) {
                 event += '<div class="notwordsalad"></div>';
             }
         }
 
     }
 
+    if (show == 1) {
+        return '<td class="' + css + '" id="' + id + '">'
+            + '<div class="date">' + innerhtml + '</div>'
+            + event
+            + '</td>';
+    }
     return '<td class="' + css + '" id="' + id + '">'
-        + '<div class="date">' + innerhtml + '</div>'
         + event
         + '</td>';
 
-};
 
+};
 
 // ------  Helper functions ------ //
 /**
@@ -456,6 +666,7 @@ TACAL.prototype.renderDate = function (date) {
 function getId(id) {
     return document.getElementById(id);
 }
+
 
 // ------  Testing ------ //
 /**
@@ -483,6 +694,6 @@ TACAL.prototype.displayVars = function (event) {
     console.log(this.calendar);
 
     console.log("* - - Events - - *");
-    console.log(this.event);
+    console.log(this.events);
 
 };
