@@ -210,7 +210,6 @@ function course_detail()
 
     // TACAL resources
     drupal_add_css(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/css/TACAL.css', 'file');
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/jquery.js', 'file');
     drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/TACAL.js', 'file');
 
 
@@ -328,7 +327,6 @@ function student_detail()
 
     // TACAL resources
     drupal_add_css(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/css/TACAL.css', 'file');
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/jquery.js', 'file');
     drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/TACAL.js', 'file');
 
 
@@ -483,6 +481,14 @@ function adm_student_detail()
     $term = htmlentities($_POST['crs_term']);
     $student_id = htmlentities($_POST['student_id']);
     $uid = htmlentities($_POST['uid']);
+    $start = htmlentities($_POST['start_date']);
+    $end = htmlentities($_POST['end_date']);
+
+    // Converting DateTime to UnixTime
+    $start = new DateTime($start);
+    $startUnix = $start->getTimestamp();
+    $end = new DateTime($end);
+    $endUnix = $end->getTimestamp();
 
     $build = "<p>Student Detail Student ID: " . $student_id . "</p>";
     $build .= "<p>Term: " . $term . "</p>";
@@ -513,6 +519,7 @@ function adm_student_detail()
         ->fields('wc', array('wordcount', 'timewriting', 'wordsperminute'))
         ->condition('type', 'writing365')
         ->condition('status', 1)
+        ->condition('created', array($startUnix, $endUnix), 'BETWEEN')
         ->condition('uid', $uid)
         ->addTag('node_access');
 

@@ -23,6 +23,10 @@ function reports_registration_block_info()
         'info' => t('Instructor reports'),
         'cache' => DRUPAL_CACHE_PER_ROLE,
     );
+    $block['calendar_report'] = array(
+        'info' => t('Calendar reports'),
+        'cache' => DRUPAL_CACHE_PER_ROLE,
+    );
     return $blocks;
 }
 
@@ -45,6 +49,15 @@ function reports_registration_block_view($delta = '')
             return $block;
         }
 
+    }
+    if($delta == 'calendar_report'){
+        $block = array(
+            'subject' => t('Calendar Report'),
+            'content' => '<p>test</p>'
+        );
+        if(user_access('view instructor reports')){
+            return $block;
+        }
     }
 }
 

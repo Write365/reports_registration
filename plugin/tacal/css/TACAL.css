@@ -7,6 +7,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700);
 
 .calendar-wrapper {
+    padding: 2em;
     font-family: 'Lato', sans-serif;
 
 }
@@ -51,12 +52,7 @@
 
 /* linear view */
 .calendar-wrapper.linear table tr td{
-    width: auto;
-    padding: 0px;
-}
-.calendar-wrapper.linear table tr td{
     width: calc(100% / 32);
-
 }
 
 /* ------- Calendar Table Head -------- */
@@ -120,7 +116,6 @@
     border: solid 2px  #D88558;
     border-bottom:none;
     border-top:none;
-    height: 38px;
 
 }
 .calendar-wrapper.linear table tbody tr td:first-child {

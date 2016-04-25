@@ -217,9 +217,11 @@ TACAL.prototype.fullMonth = function () {
     var cal = this;
     getId(this.id + 'Next').onclick = function () {
         cal.nextMonth();
+        cal.displayVars('onClick Next');
     };
     getId(this.id + 'Prev').onclick = function () {
         cal.previousMonth();
+        cal.displayVars('onClick Prev');
     }
 };
 
@@ -232,6 +234,9 @@ TACAL.prototype.showFullMonth = function () {
     var html = '';
     html += '<div class="calendar-wrapper">';
 
+    /*html += '<button id="' + this.id + 'Prev" class="btnPrev" type="button">Prev</button>';
+     html += '<button id="' + this.id + 'Next" class="btnNext" type="button">Next</button>';
+     html += '<div>';*/
 
     // --> Start table
     html += '<table>';
@@ -394,6 +399,16 @@ TACAL.prototype.linearMonth = function (begin, end) {
         }while( exit == false );
         this.showLinerMonth(monthsCal);
     }
+
+
+    console.log(monthsCal);
+
+
+
+
+
+
+
 };
 
 /**
@@ -442,7 +457,7 @@ TACAL.prototype.showLinerMonth = function (monthsCal) {
             for (var col = 0; col < monthsCal[month].calendar[row].length; col++) {
                 if (monthsCal[month].calendar[row][col].current == true) {
                     // Render date based on stored information.
-                    html += this.renderDate(monthsCal[month].calendar[row][col], 0);
+                    html += this.renderDate(monthsCal[month].calendar[row][col], 1);
                     numDays++;
                 }
             }
