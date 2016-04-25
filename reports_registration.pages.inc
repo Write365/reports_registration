@@ -74,13 +74,27 @@ function course_detail()
     $term = htmlentities($_POST['crs_term']);
     $start = htmlentities($_POST['start_date']);
     $end = htmlentities($_POST['end_date']);
-    $title = $crs_name . "-" . $crs_section . "-" . $crs_crn . "-" . $term . "-" . $crs_instructor . "-" . date('Y-m-d H:i:s');
 
-    $build = "<p>Course Detail: " . $title . "</p>";
-    $build .= "<p>Term: " . $term . "</p>";
-    $build .= "<p>CRN: " . $crs_crn . "</p>";
+    // Converting DateTime to UnixTime
+    $startUnix = new DateTime($start);
+    $startUnix = $startUnix->getTimestamp();
+    $endUnix = new DateTime($end);
+    $endUnix = $endUnix->getTimestamp();
 
-    $header = array(
+    $build = '';
+
+    // Displaying class details
+    $build .='<h2 class="report-title">Course Details: ' . $crs_name . '</h2>';
+
+    $build .= '<div class="row-fluid">'
+        . '<div class="span2"><p><strong>Term</strong></p><p>' . $term . '</p></div>'
+        . '<div class="span2"><p><strong>Section</strong></p><p>' . $crs_section . '</p></div>'
+        . '<div class="span2"><p><strong>CRN</strong></p><p>' . $crs_crn. '</p></div>'
+        . '<div class="span2"><p><strong>Instructor</strong></p><p>' . $crs_instructor. '</p></div>'
+        . '</div>';
+
+    // Building header for table.
+    /*$header = array(
         array('data' => 'Student ID', 'field' => 'student_id', 'sort' => 'desc'),
         array('data' => 'ONID', 'field' => 'onid', 'sort' => 'desc',),
         array('data' => 'Last Name', 'field' => 'last_name', 'sort' => 'desc',),
@@ -89,45 +103,119 @@ function course_detail()
         array('data' => 'Status', 'field' => 'registration_status', 'sort' => 'desc',),
         //array('data' => 'UID', 'field' => 'uid', 'sort' => 'desc',),
         //array('data' => 'Name', 'field' => 'name', 'sort' => 'desc',),
-    );
+    );*/
 
-    $result = db_select('OSU_Registration_Student_Input', 's')->extend('PagerDefault')->limit(30);
+    // Selecting all the students information that have regiesters for the class.
+    // Getting class roster.
+    $result = db_select('OSU_Registration_Student_Input', 's')/*->extend('PagerDefault')->limit(30)*/;
     $result->fields('s', array('student_id', 'onid', 'last_name', 'first_name', 'email', 'registration_status'))
         ->fields('u', array('uid', 'name'))
         ->condition('term', $term)
         ->condition('crn', $crs_crn)
-        ->addTag('node_access');
+        ->addTag('node_access')
+        ->orderBy('s.last_name');
     $result->join('users', 'u', 's.onid = u.name');
-    $result->extend('TableSort')
-        ->orderByHeader($header); //then use an extender to create the sorted table
 
+
+    // storing results of query in results
     $results = $result->execute();
 
+    // Creating rows for table
     $rows = array();
 
+    // Creating variable that will all student inforamion for js to use
+    $classInfo = array();
+
+    // Creating form for each student
+    // Formatting information for table
     foreach ($results as $row) {
 
+        // clearing the result;
+        $result = null;
+
+        // Creates a form for each student
         $form = "<form name=\"student\" action=\"student-detail\" method=\"post\">" .
             "<input type=\"hidden\" name=\"student_id\" value=\"" . $row->student_id . "\">" .
             "<input type=\"hidden\" name=\"uid\" value=\"" . $row->uid . "\">" .
             "<input type=\"hidden\" name=\"crs_term\" value=\"$term\">" .
             "<input type=\"hidden\" name=\"start_date\" value=\"$start\">" .
             "<input type=\"hidden\" name=\"end_date\" value=\"$end\">" .
-            "<input type=\"submit\" value=\"View " . $row->student_id . "\">" .
+            "<input class=\"btn\" type=\"submit\" value=\"View " . $row->student_id . "\">" .
             "</form>";
 
-        $rows[] = array(
-            "student_id" => $form,
-            "onid" => $row->onid,
-            "last_name" => $row->last_name,
-            "first_name" => $row->first_name,
-            "email" => $row->email,
-            "registration_status" => $row->registration_status,
-        );
+        /* ---- Begin: Selects the current students post --- */
+        // Selecting post for students
+        $result = db_select('node', 'n');
+
+        $result->fields('n', array('nid', 'title', 'type'))
+            ->fields('w', array('is_wordsalad', 'percent', 'score'))
+            ->fields('wc', array('wordcount', 'timewriting', 'wordsperminute'))
+            ->condition('type', 'writing365')
+            ->condition('status', 1)
+            ->condition('uid', $row->uid)
+            ->condition('created', array($startUnix, $endUnix), 'BETWEEN')
+            ->addTag('node_access')
+            ->addField('n', 'created', 'date');
+
+        $result->join('wordsalad_score', 'w', 'w.nid = n.nid');
+        $result->join('W365_JournalNodeData', 'wc', 'wc.nid = n.nid');
+
+
+        // Execute the query
+        $studentPosts = $result->execute()->fetchAll();
+        /* ---- End: Selects the current students post --- */
+
+
+        // Formatting Date for student post
+        foreach ($studentPosts as $key => $post) {
+            if (property_exists($post, 'date')) {
+                // January = 0 not 1
+                $day = date('d', $post->date);
+                $month = date('m', $post->date);
+                $year = date('Y', $post->date);
+                // Puts months in javasript date format
+                // January = 0 != 1
+                if ($month - 1 < 0) {
+                    $month = 11;
+                } else {
+                    $month--;
+                }
+                // Add a 0 for months less then 10
+                if ($month < 10) {
+                    $month = '0' . $month;
+                }
+                $studentPosts[$key]->date = $year . '-' . $month . '-' . $day;
+            }
+
+        }
+
+        // Adds the students post to the class information container
+        $classInfo[$row->student_id] = $studentPosts;
+
+        // Adding display information for calender
+        $build .= '<div>';
+        $build .='<p class="report-title">Student: ' . $row->last_name . ', ' . $row->first_name  . '</p>';
+
+        $build .= '<div class="row-fluid">'
+            . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
+            . '<div class="span1"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
+            . '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'
+            . '<div class="span3"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
+            . '<div class="span3"><p><strong>Details</strong></p><p>' . $form . '</p></div>'
+            . '</div>';
+
+        $build .= '<div id="' . $row->student_id . '"></div>';
+        $build .= '</div>';
     }
 
-    $build .= theme('table', array('header' => $header, 'rows' => $rows));
-    $build .= theme('pager');
+    // TACAL resources
+    drupal_add_css(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/css/TACAL.css', 'file');
+    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/TACAL.js', 'file');
+
+
+    // Custom js
+    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/section-detail.js', 'file');
+    drupal_add_js(array('reportsregistration' => array('startdate' => $start, 'enddate' => $end, 'classinfo' => json_encode($classInfo))), array('type' => 'setting'));
 
     return $build;
 }
@@ -160,8 +248,9 @@ function student_detail()
         ->condition('student_id', $student_id);
 
     $studentInfo = $result->execute()->fetchAll();
+
     foreach ($studentInfo as $student) {
-        $build .='<h2 class="report-title">Student Information</h2>';
+        $build .='<p class="report-title">Student Information</p>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $student->last_name . '</p></div>'
@@ -227,7 +316,7 @@ function student_detail()
 
 
     // Displaying Post Statistics
-    $build .='<h2 class="report-title">Student Post Statistics</h2>';
+    $build .='<p class="report-title">Student Post Statistics</p>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal. '</p></div>'
@@ -238,7 +327,6 @@ function student_detail()
 
     // TACAL resources
     drupal_add_css(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/css/TACAL.css', 'file');
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/jquery.js', 'file');
     drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/TACAL.js', 'file');
 
 
@@ -379,7 +467,6 @@ function adm_course_detail()
 
     $build .= theme('table', array('header' => $header, 'rows' => $rows));
     $build .= theme('pager');
-
     return $build;
 }
 
@@ -394,6 +481,14 @@ function adm_student_detail()
     $term = htmlentities($_POST['crs_term']);
     $student_id = htmlentities($_POST['student_id']);
     $uid = htmlentities($_POST['uid']);
+    $start = htmlentities($_POST['start_date']);
+    $end = htmlentities($_POST['end_date']);
+
+    // Converting DateTime to UnixTime
+    $start = new DateTime($start);
+    $startUnix = $start->getTimestamp();
+    $end = new DateTime($end);
+    $endUnix = $end->getTimestamp();
 
     $build = "<p>Student Detail Student ID: " . $student_id . "</p>";
     $build .= "<p>Term: " . $term . "</p>";
@@ -424,6 +519,7 @@ function adm_student_detail()
         ->fields('wc', array('wordcount', 'timewriting', 'wordsperminute'))
         ->condition('type', 'writing365')
         ->condition('status', 1)
+        ->condition('created', array($startUnix, $endUnix), 'BETWEEN')
         ->condition('uid', $uid)
         ->addTag('node_access');
 

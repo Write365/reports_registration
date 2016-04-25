@@ -1,11 +1,25 @@
 
 
 /* Calendar Over Rides */
-.calendar-wrapper table thead tr{
+.calendar-wrapper.linear{
+    padding: 0px !important;
+    margin: 0px !important;
+}
+.calendar-wrapper.linear table thead tr{
     height:100% !important;
+}
+.calendar-wrapper.linear table  td{
+    padding: 0px !important;
 }
 
 h2.report-title{
     border-bottom: 2px solid #CB5C20;
+
+}
+
+p.report-title{
+    border-bottom: 2px solid #CB5C20;
+    color: #CB5C20;
+    font-size: 1.3em;
 
 }
