@@ -330,7 +330,7 @@ function student_detail()
     // If not installed add js load for TACAL here.
 
     // Custom js
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/render-calendar.js', 'file');
+    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/student-detail.js', 'file');
     drupal_add_js(array('reportsregistration' => array('studentid' => $uid, 'studentpost' => json_encode($studentPosts))), array('type' => 'setting'));
 
     $build .= '<div id="' . $uid . '"></div>';
