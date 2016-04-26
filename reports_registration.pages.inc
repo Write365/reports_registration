@@ -209,8 +209,8 @@ function course_detail()
     }
 
     // TACAL resources
-    drupal_add_css(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/css/TACAL.css', 'file');
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/TACAL.js', 'file');
+    // Loaded from Write365
+    // If not installed add js load for TACAL here.
 
 
     // Custom js
@@ -326,12 +326,11 @@ function student_detail()
 
 
     // TACAL resources
-    drupal_add_css(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/css/TACAL.css', 'file');
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/plugin/tacal/js/TACAL.js', 'file');
-
+    // Loaded from Write365
+    // If not installed add js load for TACAL here.
 
     // Custom js
-    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/render-calendar.js', 'file');
+    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/student-detail.js', 'file');
     drupal_add_js(array('reportsregistration' => array('studentid' => $uid, 'studentpost' => json_encode($studentPosts))), array('type' => 'setting'));
 
     $build .= '<div id="' . $uid . '"></div>';

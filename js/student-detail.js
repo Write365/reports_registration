@@ -7,13 +7,14 @@
  */
 
 (function ($) {
+    
     $(document).ready(function() {
-        
-        this.option = {
+        var option = {
             id: Drupal.settings.reportsregistration.studentid,
-            event: JSON.parse(Drupal.settings.reportsregistration.studentpost)
+            event: JSON.parse(Drupal.settings.reportsregistration.studentpost),
+            show: ['date','wordcount', 'is_wordsalad']
         };
-        var cal = new TACAL(this.option);
+        var cal = new TACAL(option);
         cal.fullMonth();
     });
     

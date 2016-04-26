@@ -14,13 +14,14 @@
         var end = new Date(Drupal.settings.reportsregistration.enddate);
         var classKeys = Object.keys(classInfo);
         var calendars = [];
-        
+
         for (var key in classKeys) {
             var options = {
                 id: classKeys[key],
-                event: classInfo[classKeys[key]]
+                event: classInfo[classKeys[key]],
+                show: ['wordcount', 'is_wordsalad']
             };
-            var cal = new TACAL(options);
+            var cal= new TACAL(options);
             cal.linearMonth(start, end);
             calendars[classKeys[key]] = cal;
         }
