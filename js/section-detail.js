@@ -19,10 +19,11 @@
             var options = {
                 id: classKeys[key],
                 event: classInfo[classKeys[key]],
-                show: ['wordcount', 'is_wordsalad']
+                show: ['date','wordcount', 'is_wordsalad']
             };
             var cal= new TACAL(options);
-            cal.linearMonth(start, end);
+            cal.fullMonth();
+            /*cal.linearMonth(start, end);*/
             calendars[classKeys[key]] = cal;
         }
     });

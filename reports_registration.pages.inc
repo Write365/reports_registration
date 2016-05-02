@@ -84,13 +84,13 @@ function course_detail()
     $build = '';
 
     // Displaying class details
-    $build .='<h2 class="report-title">Course Details: ' . $crs_name . '</h2>';
+    $build .= '<h2 class="report-title">Course Details: ' . $crs_name . '</h2>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span2"><p><strong>Term</strong></p><p>' . $term . '</p></div>'
         . '<div class="span2"><p><strong>Section</strong></p><p>' . $crs_section . '</p></div>'
-        . '<div class="span2"><p><strong>CRN</strong></p><p>' . $crs_crn. '</p></div>'
-        . '<div class="span2"><p><strong>Instructor</strong></p><p>' . $crs_instructor. '</p></div>'
+        . '<div class="span2"><p><strong>CRN</strong></p><p>' . $crs_crn . '</p></div>'
+        . '<div class="span2"><p><strong>Instructor</strong></p><p>' . $crs_instructor . '</p></div>'
         . '</div>';
 
     // Building header for table.
@@ -107,7 +107,8 @@ function course_detail()
 
     // Selecting all the students information that have regiesters for the class.
     // Getting class roster.
-    $result = db_select('OSU_Registration_Student_Input', 's')/*->extend('PagerDefault')->limit(30)*/;
+    $result = db_select('OSU_Registration_Student_Input', 's')/*->extend('PagerDefault')->limit(30)*/
+    ;
     $result->fields('s', array('student_id', 'onid', 'last_name', 'first_name', 'email', 'registration_status'))
         ->fields('u', array('uid', 'name'))
         ->condition('term', $term)
@@ -194,7 +195,7 @@ function course_detail()
 
         // Adding display information for calender
         $build .= '<div>';
-        $build .='<p class="report-title">Student: ' . $row->last_name . ', ' . $row->first_name  . '</p>';
+        $build .= '<p class="report-title">Student: ' . $row->last_name . ', ' . $row->first_name . '</p>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
@@ -247,19 +248,19 @@ function student_detail()
     $result->fields('s', array('last_name', 'first_name', 'student_id', 'email', 'registration_status', 'onid'))
         ->condition('student_id', $student_id);
 
-    $studentInfo = $result->execute()->fetchAll();
+    // Executing query
+    $student = $result->execute()->fetch();
 
-    foreach ($studentInfo as $student) {
-        $build .='<p class="report-title">Student Information</p>';
+    // Display student school information
+    $build .= '<p class="report-title">Student Information</p>';
 
-        $build .= '<div class="row-fluid">'
-            . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $student->last_name . '</p></div>'
-            . '<div class="span2"><p><strong>First Name</strong></p><p>' . $student->first_name . '</p></div>'
-            . '<div class="span1"><p><strong>Onid</strong></p><p>' . $student->onid . '</p></div>'
-            . '<div class="span3"><p><strong>Status</strong></p><p>' . $student->registration_status . '</p></div>'
-            . '<div class="span3"><p><strong>Email</strong></p><p>' . $student->email . '</p></div>'
-            . '</div>';
-    }
+    $build .= '<div class="row-fluid">'
+        . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $student->last_name . '</p></div>'
+        . '<div class="span2"><p><strong>First Name</strong></p><p>' . $student->first_name . '</p></div>'
+        . '<div class="span1"><p><strong>Onid</strong></p><p>' . $student->onid . '</p></div>'
+        . '<div class="span3"><p><strong>Status</strong></p><p>' . $student->registration_status . '</p></div>'
+        . '<div class="span3"><p><strong>Email</strong></p><p>' . $student->email . '</p></div>'
+        . '</div>';
 
 
     // Selecting post for students
@@ -280,21 +281,23 @@ function student_detail()
 
 
     // Execute the query
-    $studentPosts = $result->execute()->fetchAll();
+    $studentPosts = $result->execute()->fetch();
 
     // Student Post Stats
-    $wordTotal = 0;
-    $entryTotal = 0;
-    $wordPerEntry = 0;
+    $wordTotal = 0;  // total number of words for the entire term.
+    $entryTotal = 0; // total number of entries for the entire term.
+    $wordPerEntry = 0; // average words per entry.
+    $wordSalad = 0; // number of WordSalad post
 
-    // Formatting Date
+    // Gathering Information on student post
     foreach ($studentPosts as $key => $post) {
+        // Formatting Date
         if (property_exists($post, 'date')) {
             // January = 0 not 1
             $day = date('d', $post->date);
             $month = date('m', $post->date);
             $year = date('Y', $post->date);
-            // Puts months in javasript date format
+            // Puts months in javascript date format
             // January = 0 != 1
             if ($month - 1 < 0) {
                 $month = 11;
@@ -307,21 +310,36 @@ function student_detail()
             }
             $studentPosts[$key]->date = $year . '-' . $month . '-' . $day;
         }
+
+        // Count number of WordSalad post
+        if ($post->is_wordsalad) {
+            $wordSalad++;
+        }
+
+        // Tallies number of entries
         $entryTotal++;
+
+        // Totaling word count
         $wordTotal += $post->wordcount;
 
     }
 
-    $wordPerEntry = round($wordTotal / $entryTotal, 3);
+    // Gets average words per entry
+    if ($entryTotal != 0) {
+        $wordPerEntry = round($wordTotal / $entryTotal, 3);
+    } else { // Defaults to 0.0, if $entryTotal is 0
+        $wordPerEntry = 0.0;
+    }
 
 
     // Displaying Post Statistics
-    $build .='<p class="report-title">Student Post Statistics</p>';
+    $build .= '<p class="report-title">Student Post Statistics</p>';
 
     $build .= '<div class="row-fluid">'
-        . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal. '</p></div>'
+        . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal . '</p></div>'
         . '<div class="span3"><p><strong>Entries Total</strong></p><p>' . $entryTotal . '</p></div>'
         . '<div class="span3"><p><strong>Words/Entries</strong></p><p>' . $wordPerEntry . '</p></div>'
+        . '<div class="span3"><p><strong>WorldSalad Count</strong></p><p>' . $wordSalad . '</p></div>'
         . '</div>';
 
 
@@ -329,10 +347,11 @@ function student_detail()
     // Loaded from Write365
     // If not installed add js load for TACAL here.
 
-    // Custom js
+    // Custom TACAL js
     drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/student-detail.js', 'file');
     drupal_add_js(array('reportsregistration' => array('studentid' => $uid, 'studentpost' => json_encode($studentPosts))), array('type' => 'setting'));
 
+    // Display Div for TACAL
     $build .= '<div id="' . $uid . '"></div>';
 
 
@@ -485,53 +504,143 @@ function adm_student_detail()
 
     // Converting DateTime to UnixTime
     $start = new DateTime($start);
-    $startUnix = $start->getTimestamp();
+    $start = $start->getTimestamp();
     $end = new DateTime($end);
-    $endUnix = $end->getTimestamp();
+    $end = $end->getTimestamp();
 
-    $build = "<p>Student Detail Student ID: " . $student_id . "</p>";
-    $build .= "<p>Term: " . $term . "</p>";
-    $build .= "<p>UID: " . $uid . "</p>";
+    $build = "";
+
+    // Getting student Information
+    $result = db_select('OSU_Registration_Student_Input', 's');
+    $result->fields('s', array('last_name', 'first_name', 'student_id', 'email', 'registration_status', 'onid'))
+        ->condition('student_id', $student_id);
+
+    // Executing query
+    $student = $result->execute()->fetch();
+
+    // Display student school information
+    $build .= '<p class="report-title">Student Information</p>';
+
+    $build .= '<div class="row-fluid">'
+        . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $student->last_name . '</p></div>'
+        . '<div class="span2"><p><strong>First Name</strong></p><p>' . $student->first_name . '</p></div>'
+        . '<div class="span1"><p><strong>Onid</strong></p><p>' . $student->onid . '</p></div>'
+        . '<div class="span3"><p><strong>Status</strong></p><p>' . $student->registration_status . '</p></div>'
+        . '<div class="span3"><p><strong>Email</strong></p><p>' . $student->email . '</p></div>'
+        . '</div>';
 
 
-    //drupal_set_title($title = t("@name's Write 365 Journal Info", array('@name' => format_username($account))), PASS_THROUGH);
+    // Selecting post for students
+    $result = db_select('node', 'n');
 
-    $build .= "<p>WordSalad is a text analysis service designed to analyze the authenticity of journal entries. WordSalad computes a probability that a journal entry was written by a person rather then fabricated using other means such as text-to-speech or random key strokes. Note: Only journal entries after January 7th, 2016 are included in this view.</p>";
-    $build .= "<p><i class=\" fa fa-exclamation-triangle fa-2x\" style=\"color:#f08080;\" title=\"Exclamation Triangle\"></i>&nbsp;&nbsp;A WordSalad value indicating that the journal entry is <u>probably not</u> structured English.<br />";
-    $build .= "<i class=\" fa fa-check fa-2x\" style=\"color:#90ee90;\" title=\"Check Mark\"></i>&nbsp;&nbsp;A WordSalad value indicating that the journal entry is <u>probably</u> structured English.</p>";
-
-
-    # configure the table header columns
-    $header = array(
-        //array('data' => 'Node ID', 'field' => 'nid'),
-        array('data' => 'Title', 'field' => 'title', 'sort' => 'ASC'),
-        array('data' => 'Created', 'field' => 'created', 'sort' => 'ASC'),
-        array('data' => 'Status', 'field' => 'is_wordsalad'),
-        array('data' => 'Wordcount', 'field' => 'wordcount'),
-
-    );
-
-    $result = db_select('node', 'n')->extend('PagerDefault')->limit(20);
-
-    $result->fields('n', array('nid', 'title', 'type', 'created'))
+    $result->fields('n', array('nid', 'title', 'type'))
         ->fields('w', array('is_wordsalad', 'percent', 'score'))
         ->fields('wc', array('wordcount', 'timewriting', 'wordsperminute'))
         ->condition('type', 'writing365')
         ->condition('status', 1)
-        ->condition('created', array($startUnix, $endUnix), 'BETWEEN')
         ->condition('uid', $uid)
-        ->addTag('node_access');
+        ->condition('created', array($start, $end), 'BETWEEN')
+        ->addTag('node_access')
+        ->addField('n', 'created', 'date');
 
     $result->join('wordsalad_score', 'w', 'w.nid = n.nid');
     $result->join('W365_JournalNodeData', 'wc', 'wc.nid = n.nid');
 
+    // Execute the query
+    $studentPosts = $result->execute()->fetchAll();
+
+    // Student Post Stats
+    $wordTotal = 0;  // total number of words for the entire term.
+    $entryTotal = 0; // total number of entries for the entire term.
+    $wordPerEntry = 0; // average words per entry.
+    $wordSalad = 0; // number of WordSalad post
+
+    // Gathering Information on student post
+    foreach ($studentPosts as $key => $post) {
+        // Formatting Date
+        if (property_exists($post, 'date')) {
+            // January = 0 not 1
+            $day = date('d', $post->date);
+            $month = date('m', $post->date);
+            $year = date('Y', $post->date);
+            // Puts months in javascript date format
+            // January = 0 != 1
+            if ($month - 1 < 0) {
+                $month = 11;
+            } else {
+                $month--;
+            }
+            // Add a 0 for months less then 10
+            if ($month < 10) {
+                $month = '0' . $month;
+            }
+            $studentPosts[$key]->date = $year . '-' . $month . '-' . $day;
+        }
+
+        // Count number of WordSalad post
+        if ($post->is_wordsalad) {
+            $wordSalad++;
+        }
+
+        // Tallies number of entries
+        $entryTotal++;
+
+        // Totaling word count
+        $wordTotal += $post->wordcount;
+
+    }
+
+    // Gets total works per entry
+    if ($entryTotal != 0) {
+        $wordPerEntry = round($wordTotal / $entryTotal, 3);
+    } else { // Defaults to 0.0, if $entryTotal is 0
+        $wordPerEntry = 0.0;
+    }
+
+
+    // Displaying Post Statistics
+    $build .= '<p class="report-title">Student Post Statistics</p>';
+
+    $build .= '<div class="row-fluid">'
+        . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal . '</p></div>'
+        . '<div class="span3"><p><strong>Entries Total</strong></p><p>' . $entryTotal . '</p></div>'
+        . '<div class="span3"><p><strong>Words/Entries</strong></p><p>' . $wordPerEntry . '</p></div>'
+        . '<div class="span3"><p><strong>WorldSalad Count</strong></p><p>' . $wordSalad . '</p></div>'
+        . '</div>';
+
+
+    // TACAL resources
+    // Loaded from Write365
+    // If not installed add js load for TACAL here.
+
+    // Custom TACAL js
+    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/student-detail.js', 'file');
+    drupal_add_js(array('reportsregistration' => array('studentid' => $uid, 'studentpost' => json_encode($studentPosts))), array('type' => 'setting'));
+
+    // Displaying  TACAL
+    $build .= '<p class="report-title">Term Calendar</p>';
+    $build .= '<div id="' . $uid . '"></div>';
+
+    // Displaying student post
+    $build .= '<p class="report-title">Student Post</p>';
+    $build .= "<p><i class=\" fa fa-exclamation-triangle fa-2x\" style=\"color:#f08080;\" title=\"Exclamation Triangle\"></i>&nbsp;&nbsp;A WordSalad value indicating that the journal entry is <u>probably not</u> structured English.<br />";
+    $build .= "<i class=\" fa fa-check fa-2x\" style=\"color:#90ee90;\" title=\"Check Mark\"></i>&nbsp;&nbsp;A WordSalad value indicating that the journal entry is <u>probably</u> structured English.</p>";
+
+
+    // Configure the table header columns
+    $header = array(
+        array('data' => 'Node Id', 'field' => 'nid'),
+        array('data' => 'Title', 'field' => 'title', 'sort' => 'ASC'),
+        array('data' => 'Created', 'field' => 'created', 'sort' => 'ASC'),
+        array('data' => 'Status', 'field' => 'is_wordsalad'),
+        array('data' => 'Wordcount', 'field' => 'wordcount'),
+    );
+
     $result->extend('TableSort')
         ->orderByHeader($header); //then use an extender to create the sorted table
-
-
     $results = $result->execute();
 
-
+    // Creating rows for table
     $rows = array();
 
     foreach ($results as $row) {
@@ -541,9 +650,9 @@ function adm_student_detail()
             $wordsalad = '<i class=" fa fa-check fa-2x" style="color:#90ee90;" title="Check Mark"></i>';
         }
         $rows[] = array(
-            //"nid"  =>  $row->nid,
+            "nid" => $row->nid,
             "title" => "<a href='/node/" . $row->nid . "''/>" . $row->title . "</a>",
-            "created" => date('F j, Y, g:i a', $row->created),
+            "created" => date('F j, Y, g:i a', $row->date),
             "is_wordsalad" => $wordsalad,
             "wordcount" => $row->wordcount,
         );
@@ -551,7 +660,7 @@ function adm_student_detail()
 
     $build .= theme('table', array('header' => $header, 'rows' => $rows));
 
-    # add the pager
+    // Add the pager
     $build .= theme('pager');
 
     return $build;
