@@ -200,12 +200,13 @@ function reports_registration_schema() {
 /*
  * hook_update function
  */
+function reports_registration_update_7105(){
+    return t('Reports_registration module is now updated to version 1.5');
+}
 
 function reports_registration_update_7104(){
     return t('Reports_registration module is now updated to version 1.4');
 }
 
-function reports_registration_update_7105(){
-    return t('Reports_registration module is now updated to version 1.5');
-}
+
 

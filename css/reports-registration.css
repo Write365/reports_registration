@@ -1,14 +1,14 @@
 
 
 /* Calendar Over Rides */
-.calendar-wrapper.linear{
+.calendar-wrapper{
     padding: 0px !important;
     margin: 0px !important;
 }
-.calendar-wrapper.linear table thead tr{
+.calendar-wrapper table thead tr{
     height:100% !important;
 }
-.calendar-wrapper.linear table  td{
+.calendar-wrapper table  td{
     padding: 0px !important;
 }
 
