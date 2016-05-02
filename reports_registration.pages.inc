@@ -281,7 +281,7 @@ function student_detail()
 
 
     // Execute the query
-    $studentPosts = $result->execute()->fetch();
+    $studentPosts = $result->execute()->fetchAll();
 
     // Student Post Stats
     $wordTotal = 0;  // total number of words for the entire term.
