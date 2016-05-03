@@ -212,7 +212,6 @@ function course_detail($crn = null, $term = null)
     // Loaded from Write365
     // If not installed add js load for TACAL here.
 
-
     // Custom js
     drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/section-detail.js', 'file');
     drupal_add_js(array('reportsregistration' => array('classinfo' => json_encode($classInfo))), array('type' => 'setting'));
@@ -251,7 +250,6 @@ function student_detail($crn = null, $term = null, $uid = null)
 
     // Start Page build
     $build = "";
-
 
     // Display student school information
     $build .= '<p class="report-title">Student Information</p>';
@@ -390,17 +388,12 @@ function adm_courses_list()
 
     foreach ($result as $row) { // add the data
 
-        $form = "<form name=\"courses\" action=\"adm-course-detail\" method=\"post\">" .
-            "<input type=\"hidden\" name=\"crs_crn\" value=\"" . $row->crn . "\">" .
-            "<input type=\"hidden\" name=\"crs_name\" value=\"" . $row->course_name . "\">" .
-            "<input type=\"hidden\" name=\"crs_section\" value=\"" . $row->section_number . "\">" .
-            "<input type=\"hidden\" name=\"crs_instructor\" value=\"" . $row->instructor_name . "\">" .
-            "<input type=\"hidden\" name=\"crs_term\" value=\"$row->term\">" .
-            "<input type=\"hidden\" name=\"start_date\" value=\"$row->start_date\">" .
-            "<input type=\"hidden\" name=\"end_date\" value=\"$row->end_date\">" .
-            "<input type=\"submit\" value=\"View " . $row->crn . "\">" .
-            "</form>";
-        $rows[$row->crn]['crn'] = $form;
+        $rows[$row->crn]['crn'] = '<a href="'
+            . $GLOBALS['base_url']
+            . '/reports_registration/administrator/adm-course-detail/'
+            . $row->crn . '/' . $row->term . '">
+            <div class="btn btn-default">' . $row->crn . '</div>
+        </a>';
         $rows[$row->crn]['instructor_name'] = $row->instructor_name;
         $rows[$row->crn]['course_name'] = $row->course_name;
         $rows[$row->crn]['section_number'] = $row->section_number;
@@ -408,7 +401,7 @@ function adm_courses_list()
     }
 
     $build = "<p>The following are your courses registered with the Write 365 application (across all terms).</p>
-<p>Note: Columns are sortable. Click on the column heading to change the sort order.</p>";
+                <p>Note: Columns are sortable. Click on the column heading to change the sort order.</p>";
     $build .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'sort-table')));
     $build .= theme('pager');
 
@@ -416,78 +409,168 @@ function adm_courses_list()
 
 }
 
-function adm_course_detail()
+function adm_course_detail($crn = null, $term = null)
 {
-
+    if ($crn == null || $term == null) {
+        $build = '<h3>CRN or Term could not be found.</h3>';
+        return $build;
+    }
     global $user;
 
-    // First the $_POST vars
-    $crs_crn = htmlentities($_POST['crs_crn']);
-    $crs_name = htmlentities($_POST['crs_name']);
-    $crs_section = htmlentities($_POST['crs_section']);
-    $crs_instructor = htmlentities($_POST['crs_instructor']);
-    $term = htmlentities($_POST['crs_term']);
-    $start = htmlentities($_POST['start_date']);
-    $end = htmlentities($_POST['end_date']);
+    // Getting Term Information
+    $result = db_select('OSU_Registration_Instructor_Input', 'i');
+    $result->fields('i', array('instructor_name', 'crn', 'course_name', 'section_number', 'term'))
+        ->fields('t', array('term_description', 'start_date', 'end_date'))
+        ->condition('crn', $crn)
+        ->condition('term', $term);
+    $result->join('OSU_Registration_Term_Validation', 't', 't.term_code = i.term');
 
-    $title = $crs_name . "-" . $crs_section . "-" . $crs_crn . "-" . $term . "-" . $crs_instructor . "-" . date('Y-m-d H:i:s');
+    $course = $result->execute()->fetchObject();
 
-    $build = "<p>Course Detail: " . $title . "</p>";
-    $build .= "<p>Term: " . $term . "</p>";
-    $build .= "<p>CRN: " . $crs_crn . "</p>";
+    // Converting DateTime to UnixTime
+    $startUnix = new DateTime($course->start_date);
+    $startUnix = $startUnix->getTimestamp();
+    $endUnix = new DateTime($course->end_date);
+    $endUnix = $endUnix->getTimestamp();
 
-    $header = array(
+    $build = '';
+
+    // Displaying class details
+    $build .= '<h2 class="report-title">Course Details: ' . $course->crn . '</h2>';
+
+    $build .= '<div class="row-fluid">'
+        . '<div class="span2"><p><strong>Term</strong></p><p>' . $course->term . '</p></div>'
+        . '<div class="span2"><p><strong>Section</strong></p><p>' . $course->section_number . '</p></div>'
+        . '<div class="span2"><p><strong>CRN</strong></p><p>' . $course->crn . '</p></div>'
+        . '<div class="span2"><p><strong>Instructor</strong></p><p>' . $course->instructor_name . '</p></div>'
+        . '</div>';
+
+    // Building header for table.
+    /*$header = array(
         array('data' => 'Student ID', 'field' => 'student_id', 'sort' => 'desc'),
         array('data' => 'ONID', 'field' => 'onid', 'sort' => 'desc',),
         array('data' => 'Last Name', 'field' => 'last_name', 'sort' => 'desc',),
         array('data' => 'First Name', 'field' => 'first_name', 'sort' => 'desc',),
         array('data' => 'Email', 'field' => 'email', 'sort' => 'desc',),
         array('data' => 'Status', 'field' => 'registration_status', 'sort' => 'desc',),
-    );
+        //array('data' => 'UID', 'field' => 'uid', 'sort' => 'desc',),
+        //array('data' => 'Name', 'field' => 'name', 'sort' => 'desc',),
+    );*/
 
-    $result = db_select('OSU_Registration_Student_Input', 's')->extend('PagerDefault')->limit(30);
+    // Selecting all the students information that have regiesters for the class.
+    // Getting class roster.
+    $result = db_select('OSU_Registration_Student_Input', 's');
     $result->fields('s', array('student_id', 'onid', 'last_name', 'first_name', 'email', 'registration_status'))
         ->fields('u', array('uid', 'name'))
-        ->condition('term', $term)
-        ->condition('crn', $crs_crn)
-        ->addTag('node_access');
+        ->condition('term', $course->term)
+        ->condition('crn', $course->crn)
+        ->addTag('node_access')
+        ->orderBy('s.last_name');
     $result->join('users', 'u', 's.onid = u.name');
-    $result->extend('TableSort')
-        ->orderByHeader($header); //then use an extender to create the sorted table
 
+
+    // storing results of query in results
     $results = $result->execute();
 
+    // Creating rows for table
     $rows = array();
 
+    // Creating variable that will all student inforamion for js to use
+    $classInfo = array();
+
+    // Creating form for each student
+    // Formatting information for table
     foreach ($results as $row) {
 
-        $form = "<form name=\"student\" action=\"adm-student-detail\" method=\"post\">" .
-            "<input type=\"hidden\" name=\"student_id\" value=\"" . $row->student_id . "\">" .
-            "<input type=\"hidden\" name=\"uid\" value=\"" . $row->uid . "\">" .
-            "<input type=\"hidden\" name=\"crs_term\" value=\"$term\">" .
-            "<input type=\"hidden\" name=\"start_date\" value=\"$start\">" .
-            "<input type=\"hidden\" name=\"end_date\" value=\"$end\">" .
-            "<input type=\"submit\" value=\"View " . $row->student_id . "\">" .
-            "</form>";
+        // clearing the result;
+        $result = null;
 
-        $rows[] = array(
-            "student_id" => $form,
-            "onid" => $row->onid,
-            "last_name" => $row->last_name,
-            "first_name" => $row->first_name,
-            "email" => $row->email,
-            "registration_status" => $row->registration_status,
-            //"uid" => $uid,
-            //"name" => $name,
-        );
+        /* ---- Begin: Selects the current students post --- */
+        // Selecting post for students
+        $result = db_select('node', 'n');
+
+        $result->fields('n', array('nid', 'title', 'type'))
+            ->fields('w', array('is_wordsalad', 'percent', 'score'))
+            ->fields('wc', array('wordcount', 'timewriting', 'wordsperminute'))
+            ->condition('type', 'writing365')
+            ->condition('status', 1)
+            ->condition('uid', $row->uid)
+            ->condition('created', array($startUnix, $endUnix), 'BETWEEN')
+            ->addTag('node_access')
+            ->addField('n', 'created', 'date');
+
+        $result->join('wordsalad_score', 'w', 'w.nid = n.nid');
+        $result->join('W365_JournalNodeData', 'wc', 'wc.nid = n.nid');
+
+
+        // Execute the query
+        $studentPosts = $result->execute()->fetchAll();
+        /* ---- End: Selects the current students post --- */
+
+        // Building Student Detail button
+        $button = '<a href="'
+            . $GLOBALS['base_url']
+            . '/reports_registration/administrator/adm-student-detail/'
+            . $course->crn . '/'
+            . $course->term . '/'
+            . $row->uid
+            . '"><div class="btn btn-default">View Student Detail</div> </a>';
+
+
+        // Formatting Date for student post
+        foreach ($studentPosts as $key => $post) {
+            if (property_exists($post, 'date')) {
+                // January = 0 not 1
+                $day = date('d', $post->date);
+                $month = date('m', $post->date);
+                $year = date('Y', $post->date);
+                // Puts months in javasript date format
+                // January = 0 != 1
+                if ($month - 1 < 0) {
+                    $month = 11;
+                } else {
+                    $month--;
+                }
+                // Add a 0 for months less then 10
+                if ($month < 10) {
+                    $month = '0' . $month;
+                }
+                $studentPosts[$key]->date = $year . '-' . $month . '-' . $day;
+            }
+
+        }
+
+        // Adds the students post to the class information container
+        $classInfo[$row->student_id] = $studentPosts;
+
+        // Adding display information for calender
+        $build .= '<div>';
+        $build .= '<p class="report-title">Student: ' . $row->last_name . ', ' . $row->first_name . '</p>';
+
+        $build .= '<div class="row-fluid">'
+            . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
+            . '<div class="span1"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
+            . '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'
+            . '<div class="span3"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
+            . '<div class="span3"><p><strong>Details</strong></p><p>' . $button . '</p></div>'
+            . '</div>';
+
+        $build .= '<div id="' . $row->student_id . '"></div>';
+        $build .= '</div>';
     }
 
-    $build .= theme('table', array('header' => $header, 'rows' => $rows));
-    $build .= theme('pager');
+    // TACAL resources
+    // Loaded from Write365
+    // If not installed add js load for TACAL here.
+
+    // Custom js
+    drupal_add_js(drupal_get_path('module', 'reports_registration') . '/js/section-detail.js', 'file');
+    drupal_add_js(array('reportsregistration' => array('classinfo' => json_encode($classInfo))), array('type' => 'setting'));
+
     return $build;
 }
 
-function adm_student_detail()
+function adm_student_detail($crn = null, $term = null, $uid = null)
 {
     /*
      * This is the report for an individual student.
@@ -495,37 +578,39 @@ function adm_student_detail()
      */
     global $user;
 
-    $term = htmlentities($_POST['crs_term']);
-    $student_id = htmlentities($_POST['student_id']);
-    $uid = htmlentities($_POST['uid']);
-    $start = htmlentities($_POST['start_date']);
-    $end = htmlentities($_POST['end_date']);
+    // Get Student course information
+    $result = db_select('OSU_Registration_Student_Input', 's');
+    $result->fields('s', array('student_id', 'onid', 'last_name', 'first_name', 'email', 'registration_status'))
+        ->fields('t', array('start_date', 'end_date'))
+        ->fields('u', array('uid'))
+        ->condition('term', $term)
+        ->condition('crn', $crn)
+        ->condition('uid', $uid)
+        ->addTag('node_access');
+
+    $result->join('OSU_Registration_Term_Validation', 't', 't.term_code = s.term');
+    $result->join('users', 'u', 'u.name = s.onid');
+
+    $studentInfo = $result->execute()->fetchObject();
 
     // Converting DateTime to UnixTime
-    $start = new DateTime($start);
+    $start = new DateTime($studentInfo->start_date);
     $start = $start->getTimestamp();
-    $end = new DateTime($end);
+    $end = new DateTime($studentInfo->end_date);
     $end = $end->getTimestamp();
 
+    // Start Page build
     $build = "";
-
-    // Getting student Information
-    $result = db_select('OSU_Registration_Student_Input', 's');
-    $result->fields('s', array('last_name', 'first_name', 'student_id', 'email', 'registration_status', 'onid'))
-        ->condition('student_id', $student_id);
-
-    // Executing query
-    $student = $result->execute()->fetch();
 
     // Display student school information
     $build .= '<p class="report-title">Student Information</p>';
 
     $build .= '<div class="row-fluid">'
-        . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $student->last_name . '</p></div>'
-        . '<div class="span2"><p><strong>First Name</strong></p><p>' . $student->first_name . '</p></div>'
-        . '<div class="span1"><p><strong>Onid</strong></p><p>' . $student->onid . '</p></div>'
-        . '<div class="span3"><p><strong>Status</strong></p><p>' . $student->registration_status . '</p></div>'
-        . '<div class="span3"><p><strong>Email</strong></p><p>' . $student->email . '</p></div>'
+        . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $studentInfo->last_name . '</p></div>'
+        . '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'
+        . '<div class="span1"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
+        . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
+        . '<div class="span3"><p><strong>Email</strong></p><p>' . $studentInfo->email . '</p></div>'
         . '</div>';
 
 
