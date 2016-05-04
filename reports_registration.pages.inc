@@ -85,7 +85,7 @@ function course_detail($crn = null, $term = null)
     $build = '';
 
     // Displaying class details
-    $build .= '<h2 class="report-title">Course Details: ' . $course->crn . '</h2>';
+    $build .= '<h3 class="section-header">Course Details: ' . $course->crn . '</h3>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span2"><p><strong>Term</strong></p><p>' . $course->term . '</p></div>'
@@ -157,13 +157,10 @@ function course_detail($crn = null, $term = null)
         /* ---- End: Selects the current students post --- */
 
         // Building Student Detail button
-        $button = '<a href="'
-            . $GLOBALS['base_url']
+        $button = '<a href="' . $GLOBALS['base_url']
             . '/reports_registration/instructor/student-detail/'
-            . $course->crn . '/'
-            . $course->term . '/'
-            . $row->uid
-            . '"><div class="btn btn-default">View Student Detail</div> </a>';
+            . $course->crn . '/' . $course->term . '/' . $row->uid
+            . '"><div class="btn btn-default">View Student Detail</div></a>';
 
 
         // Formatting Date for student post
@@ -194,15 +191,16 @@ function course_detail($crn = null, $term = null)
 
         // Adding display information for calender
         $build .= '<div>';
-        $build .= '<p class="report-title">Student: ' . $row->last_name . ', ' . $row->first_name . '</p>';
+        $build .= '<h4 class="section-header">Student: ' . $row->last_name . ', ' . $row->first_name . '<span class="status">' . $row->registration_status . '</span></h4>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
-            . '<div class="span1"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
-            . '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'
-            . '<div class="span3"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
-            . '<div class="span3"><p><strong>Details</strong></p><p>' . $button . '</p></div>'
+            . '<div class="span2"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
+            /*. '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'*/
+            . '<div class="span5"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
+            . '<div class="span3"><p><strong>Details</strong></p>' . $button . '</div>'
             . '</div>';
+
 
         $build .= '<div id="' . $row->student_id . '"></div>';
         $build .= '</div>';
@@ -252,12 +250,12 @@ function student_detail($crn = null, $term = null, $uid = null)
     $build = "";
 
     // Display student school information
-    $build .= '<p class="report-title">Student Information</p>';
+    $build .= '<h2 class="section-header">Student Information</h2>';
 
     $build .= '<div class="row-fluid">'
-        . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $studentInfo->last_name . '</p></div>'
-        . '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'
-        . '<div class="span1"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
+        . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', '. $studentInfo->first_name .'</p></div>'
+        /*. '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'*/
+        . '<div class="span2"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
         . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
         . '<div class="span3"><p><strong>Email</strong></p><p>' . $studentInfo->email . '</p></div>'
         . '</div>';
@@ -332,7 +330,7 @@ function student_detail($crn = null, $term = null, $uid = null)
 
 
     // Displaying Post Statistics
-    $build .= '<p class="report-title">Student Post Statistics</p>';
+    $build .= '<h3 class="section-header">Student Post Statistics</h3>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal . '</p></div>'
@@ -436,7 +434,7 @@ function adm_course_detail($crn = null, $term = null)
     $build = '';
 
     // Displaying class details
-    $build .= '<h2 class="report-title">Course Details: ' . $course->crn . '</h2>';
+    $build .= '<h3 class="section-header">Course Details: ' . $course->crn . '</h3>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span2"><p><strong>Term</strong></p><p>' . $course->term . '</p></div>'
@@ -514,7 +512,7 @@ function adm_course_detail($crn = null, $term = null)
             . $course->crn . '/'
             . $course->term . '/'
             . $row->uid
-            . '"><div class="btn btn-default">View Student Detail</div> </a>';
+            . '"><div class="btn btn-default">View Student Detail</div></a>';
 
 
         // Formatting Date for student post
@@ -545,14 +543,14 @@ function adm_course_detail($crn = null, $term = null)
 
         // Adding display information for calender
         $build .= '<div>';
-        $build .= '<p class="report-title">Student: ' . $row->last_name . ', ' . $row->first_name . '</p>';
+        $build .= '<h4 class="section-header">Student: ' . $row->last_name . ', ' . $row->first_name . '<span class="status">' . $row->registration_status . '</span></h4>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
-            . '<div class="span1"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
-            . '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'
-            . '<div class="span3"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
-            . '<div class="span3"><p><strong>Details</strong></p><p>' . $button . '</p></div>'
+            . '<div class="span2"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
+            /*. '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'*/
+            . '<div class="span5"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
+            . '<div class="span3"><p><strong>Details</strong></p>' . $button . '</div>'
             . '</div>';
 
         $build .= '<div id="' . $row->student_id . '"></div>';
@@ -603,12 +601,12 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
     $build = "";
 
     // Display student school information
-    $build .= '<p class="report-title">Student Information</p>';
+    $build .= '<h2 class="section-header">Student Information</h2>';
 
     $build .= '<div class="row-fluid">'
-        . '<div class="span2"><p><strong>Last Name</strong></p><p>' . $studentInfo->last_name . '</p></div>'
-        . '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'
-        . '<div class="span1"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
+        . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', '. $studentInfo->first_name .'</p></div>'
+        /*. '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'*/
+        . '<div class="span2"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
         . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
         . '<div class="span3"><p><strong>Email</strong></p><p>' . $studentInfo->email . '</p></div>'
         . '</div>';
@@ -683,7 +681,7 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
 
 
     // Displaying Post Statistics
-    $build .= '<p class="report-title">Student Post Statistics</p>';
+    $build .= '<h4 class="section-header">Student Post Statistics</h4>';
 
     $build .= '<div class="row-fluid">'
         . '<div class="span3"><p><strong>Word Total</strong></p><p>' . $wordTotal . '</p></div>'
@@ -702,11 +700,11 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
     drupal_add_js(array('reportsregistration' => array('studentid' => $uid, 'studentpost' => json_encode($studentPosts))), array('type' => 'setting'));
 
     // Displaying  TACAL
-    $build .= '<p class="report-title">Term Calendar</p>';
+    $build .= '<h4 class="section-header">Term Calendar</h4>';
     $build .= '<div id="' . $uid . '"></div>';
 
     // Displaying student post
-    $build .= '<p class="report-title">Student Post</p>';
+    $build .= '<h4 class="section-header">Student Post</h4>';
     $build .= "<p><i class=\" fa fa-exclamation-triangle fa-2x\" style=\"color:#f08080;\" title=\"Exclamation Triangle\"></i>&nbsp;&nbsp;A WordSalad value indicating that the journal entry is <u>probably not</u> structured English.<br />";
     $build .= "<i class=\" fa fa-check fa-2x\" style=\"color:#90ee90;\" title=\"Check Mark\"></i>&nbsp;&nbsp;A WordSalad value indicating that the journal entry is <u>probably</u> structured English.</p>";
 
