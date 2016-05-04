@@ -50,12 +50,12 @@ function reports_registration_block_view($delta = '')
         }
 
     }
-    if($delta == 'calendar_report'){
+    if ($delta == 'calendar_report') {
         $block = array(
             'subject' => t('Calendar Report'),
             'content' => '<p>test</p>'
         );
-        if(user_access('view instructor reports')){
+        if (user_access('view instructor reports')) {
             return $block;
         }
     }
@@ -119,62 +119,67 @@ function reports_registration_menu()
 {
     $items = array();
     /**
-    $items['admin/config/people/reports_registration'] = array(
-        'title' => 'OSU Write 365 Reports and Registration',
-        'description' => 'Reports, Registration, and Configuration Page for the Oregon State University Write 365 installation.',
-        'page callback' => 'drupal_get_form',
-        'access arguments' => array('administer reports and registrations'),
-        'type' => MENU_NORMAL_ITEM,
-    );
+     * $items['admin/config/people/reports_registration'] = array(
+     * 'title' => 'OSU Write 365 Reports and Registration',
+     * 'description' => 'Reports, Registration, and Configuration Page for the Oregon State University Write 365 installation.',
+     * 'page callback' => 'drupal_get_form',
+     * 'access arguments' => array('administer reports and registrations'),
+     * 'type' => MENU_NORMAL_ITEM,
+     * );
      **/
     $items['reports_registration/instructor/reports'] = array(
-      'title' => 'Section Report',
-      'description' => 'Your Write 365 section listing.',
-      'page callback' => 'course_list',
-      'access arguments' => array('view instructor reports'),
-      'type' => MENU_NORMAL_ITEM,
-      'file' => 'reports_registration.pages.inc',
+        'title' => 'Section Report',
+        'description' => 'Your Write 365 section listing.',
+        'page callback' => 'course_list',
+        'access arguments' => array('view instructor reports'),
+        'type' => MENU_NORMAL_ITEM,
+        'file' => 'reports_registration.pages.inc',
     );
-    $items['reports_registration/instructor/course-detail'] = array(
+    $items['reports_registration/instructor/course-detail/%/%'] = array(
         'title' => 'Section Report',
         'description' => 'Your Write 365 section listing.',
         'page callback' => 'course_detail',
+        'page arguments' => array(3, 4),
         'access arguments' => array('view instructor reports'),
-        'type' => MENU_LOCAL_TASK,
+        'type' => MENU_NORMAL_ITEM,
         'file' => 'reports_registration.pages.inc',
     );
-    $items['reports_registration/instructor/student-detail'] = array(
+
+    $items['reports_registration/instructor/student-detail/%/%/%'] = array(
         'title' => 'Section Report',
         'description' => 'Your Write 365 section listing.',
         'page callback' => 'student_detail',
+        'page arguments' => array(3, 4, 5),
         'access arguments' => array('view instructor reports'),
         'type' => MENU_LOCAL_TASK,
         'file' => 'reports_registration.pages.inc',
     );
-    
+
     $items['reports_registration/administrator/adm-reports'] = array(
-      'title' => 'All Sections Report (Admin)',
-      'description' => 'Write 365 Course Sections.',
-      'page callback' => 'adm_courses_list',
-      'access arguments' => array('administer reports and registrations'),
-      'type' => MENU_NORMAL_ITEM,
-      'file' => 'reports_registration.pages.inc',
+        'title' => 'All Sections Report (Admin)',
+        'description' => 'Write 365 Course Sections.',
+        'page callback' => 'adm_courses_list',
+        'access arguments' => array('administer reports and registrations'),
+        'type' => MENU_NORMAL_ITEM,
+        'file' => 'reports_registration.pages.inc',
     );
-    $items['reports_registration/administrator/adm-course-detail'] = array(
-      'title' => 'All Sections Report (Admin)',
-      'description' => 'Write 365 section listing.',
-      'page callback' => 'adm_course_detail',
-      'access arguments' => array('administer reports and registrations'),
-      'type' => MENU_LOCAL_TASK,
-      'file' => 'reports_registration.pages.inc',
+    $items['reports_registration/administrator/adm-course-detail/%/%'] = array(
+        'title' => 'All Sections Report (Admin)',
+        'description' => 'Write 365 section listing.',
+        'page callback' => 'adm_course_detail',
+        'page arguments' => array(3,4),
+        'access arguments' => array('administer reports and registrations'),
+        'type' => MENU_NORMAL_ITEM,
+        'file' => 'reports_registration.pages.inc',
     );
-    $items['reports_registration/administrator/adm-student-detail'] = array(
-      'title' => 'All Sections Report (Admin)',
-      'description' => 'Write 365 student detail.',
-      'page callback' => 'adm_student_detail',
-      'access arguments' => array('administer reports and registrations'),
-      'type' => MENU_LOCAL_TASK,
-      'file' => 'reports_registration.pages.inc',
+    $items['reports_registration/administrator/adm-student-detail/%/%/%'] = array(
+        'title' => 'All Sections Report (Admin)',
+        'description' => 'Write 365 student detail.',
+        'page callback' => 'adm_student_detail',
+        'page arguments' => array(3, 4, 5),
+        'access arguments' => array('administer reports and registrations'),
+        'type' => MENU_LOCAL_TASK,
+        'file' => 'reports_registration.pages.inc',
     );
     return $items;
 }
