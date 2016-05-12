@@ -13,11 +13,11 @@ function course_list()
     global $user;
 
     $header = array(
-        array('data' => t('Report by CRN'), 'field' => 'i.crn', 'sort' => 'desc'),
-        array('data' => t('Instructor'), 'field' => 'i.instructor_name', 'sort' => 'desc',),
-        array('data' => t('Course Name'), 'field' => 'i.course_name', 'sort' => 'desc',),
-        array('data' => t('Section Number'), 'field' => 'i.section_number', 'sort' => 'desc',),
-        array('data' => t('Term'), 'field' => 'i.term', 'sort' => 'desc',),
+        array('data' => t('Report by CRN'), 'field' => 'i.crn'),
+        array('data' => t('Instructor'), 'field' => 'i.instructor_name'),
+        array('data' => t('Course Name'), 'field' => 'i.course_name'),
+        array('data' => t('Section Number'), 'field' => 'i.section_number'),
+        array('data' => t('Term'), 'field' => 'i.term', 'sort' => 'desc'),
     );
 
     $courses = db_select('OSU_Registration_Instructor_Input', 'i');
@@ -51,7 +51,8 @@ function course_list()
 
     $build = "<p>The following are your courses registered with the Write 365 application (across all terms).</p>
                 <p>Note: Columns are sortable. Click on the column heading to change the sort order.</p>";
-    $build .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'sort-table')));
+    $build .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'sort-table', 'class' => array('write365-table'))));
+
     $build .= theme('pager');
 
     return $build; // done
@@ -191,7 +192,7 @@ function course_detail($crn = null, $term = null)
 
         // Adding display information for calender
         $build .= '<div>';
-        $build .= '<h4 class="section-header">Student: ' . $row->last_name . ', ' . $row->first_name . '<span class="status">' . $row->registration_status . '</span></h4>';
+        $build .= '<h4 class="section-header">Student: ' . $row->last_name . ', ' . $row->first_name . '<span class="report-status">' . $row->registration_status . '</span></h4>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
@@ -253,7 +254,7 @@ function student_detail($crn = null, $term = null, $uid = null)
     $build .= '<h2 class="section-header">Student Information</h2>';
 
     $build .= '<div class="row-fluid">'
-        . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', '. $studentInfo->first_name .'</p></div>'
+        . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', ' . $studentInfo->first_name . '</p></div>'
         /*. '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'*/
         . '<div class="span2"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
         . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
@@ -363,11 +364,11 @@ function adm_courses_list()
     global $user;
 
     $header = array(
-        array('data' => t('Report by CRN'), 'field' => 'i.crn', 'sort' => 'desc'),
-        array('data' => t('Instructor'), 'field' => 'i.instructor_name', 'sort' => 'desc',),
-        array('data' => t('Course Name'), 'field' => 'i.course_name', 'sort' => 'desc',),
-        array('data' => t('Section Number'), 'field' => 'i.section_number', 'sort' => 'desc',),
-        array('data' => t('Term'), 'field' => 'i.term', 'sort' => 'desc',),
+        array('data' => t('Report by CRN'), 'field' => 'i.crn'),
+        array('data' => t('Instructor'), 'field' => 'i.instructor_name'),
+        array('data' => t('Course Name'), 'field' => 'i.course_name'),
+        array('data' => t('Section Number'), 'field' => 'i.section_number'),
+        array('data' => t('Term'), 'field' => 'i.term', 'sort' => 'desc'),
     );
 
     $courses = db_select('OSU_Registration_Instructor_Input', 'i');
@@ -400,7 +401,7 @@ function adm_courses_list()
 
     $build = "<p>The following are your courses registered with the Write 365 application (across all terms).</p>
                 <p>Note: Columns are sortable. Click on the column heading to change the sort order.</p>";
-    $build .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'sort-table')));
+    $build .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'sort-table', 'class' => array('write365-table'))));
     $build .= theme('pager');
 
     return $build; // done
@@ -543,7 +544,7 @@ function adm_course_detail($crn = null, $term = null)
 
         // Adding display information for calender
         $build .= '<div>';
-        $build .= '<h4 class="section-header">Student: ' . $row->last_name . ', ' . $row->first_name . '<span class="status">' . $row->registration_status . '</span></h4>';
+        $build .= '<h4 class="section-header">Student: ' . $row->last_name . ', ' . $row->first_name . '<span class="report-status">' . $row->registration_status . '</span></h4>';
 
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
@@ -604,7 +605,7 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
     $build .= '<h2 class="section-header">Student Information</h2>';
 
     $build .= '<div class="row-fluid">'
-        . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', '. $studentInfo->first_name .'</p></div>'
+        . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', ' . $studentInfo->first_name . '</p></div>'
         /*. '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'*/
         . '<div class="span2"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
         . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
@@ -740,7 +741,7 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
         );
     }
 
-    $build .= theme('table', array('header' => $header, 'rows' => $rows));
+    $build .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'sort-table', 'class' => array('write365-table'))));
 
     // Add the pager
     $build .= theme('pager');
