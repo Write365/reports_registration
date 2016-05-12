@@ -151,7 +151,7 @@ function reports_registration_menu()
         'page callback' => 'student_detail',
         'page arguments' => array(3, 4, 5),
         'access arguments' => array('view instructor reports'),
-        'type' => MENU_LOCAL_TASK,
+        'type' => MENU_NORMAL_ITEM,
         'file' => 'reports_registration.pages.inc',
     );
 
@@ -178,7 +178,7 @@ function reports_registration_menu()
         'page callback' => 'adm_student_detail',
         'page arguments' => array(3, 4, 5),
         'access arguments' => array('administer reports and registrations'),
-        'type' => MENU_LOCAL_TASK,
+        'type' => MENU_NORMAL_ITEM,
         'file' => 'reports_registration.pages.inc',
     );
     return $items;
