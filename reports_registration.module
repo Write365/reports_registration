@@ -118,15 +118,7 @@ function reports_registration_help($path, $arg)
 function reports_registration_menu()
 {
     $items = array();
-    /**
-     * $items['admin/config/people/reports_registration'] = array(
-     * 'title' => 'OSU Write 365 Reports and Registration',
-     * 'description' => 'Reports, Registration, and Configuration Page for the Oregon State University Write 365 installation.',
-     * 'page callback' => 'drupal_get_form',
-     * 'access arguments' => array('administer reports and registrations'),
-     * 'type' => MENU_NORMAL_ITEM,
-     * );
-     **/
+
     $items['reports_registration/instructor/reports'] = array(
         'title' => 'Section Report',
         'description' => 'Your Write 365 section listing.',

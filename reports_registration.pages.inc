@@ -255,7 +255,6 @@ function student_detail($crn = null, $term = null, $uid = null)
 
     $build .= '<div class="row-fluid">'
         . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', ' . $studentInfo->first_name . '</p></div>'
-        /*. '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'*/
         . '<div class="span2"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
         . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
         . '<div class="span3"><p><strong>Email</strong></p><p>' . $studentInfo->email . '</p></div>'
@@ -549,7 +548,6 @@ function adm_course_detail($crn = null, $term = null)
         $build .= '<div class="row-fluid">'
             . '<div class="span2"><p><strong>Student Id</strong></p><p>' . $row->student_id . '</p></div>'
             . '<div class="span2"><p><strong>Onid</strong></p><p>' . $row->onid . '</p></div>'
-            /*. '<div class="span3"><p><strong>Status</strong></p><p>' . $row->registration_status . '</p></div>'*/
             . '<div class="span5"><p><strong>Email</strong></p><p>' . $row->email . '</p></div>'
             . '<div class="span3"><p><strong>Details</strong></p>' . $button . '</div>'
             . '</div>';
@@ -606,7 +604,6 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
 
     $build .= '<div class="row-fluid">'
         . '<div class="span3"><p><strong>Name</strong></p><p>' . $studentInfo->last_name . ', ' . $studentInfo->first_name . '</p></div>'
-        /*. '<div class="span2"><p><strong>First Name</strong></p><p>' . $studentInfo->first_name . '</p></div>'*/
         . '<div class="span2"><p><strong>Onid</strong></p><p>' . $studentInfo->onid . '</p></div>'
         . '<div class="span3"><p><strong>Status</strong></p><p>' . $studentInfo->registration_status . '</p></div>'
         . '<div class="span3"><p><strong>Email</strong></p><p>' . $studentInfo->email . '</p></div>'
