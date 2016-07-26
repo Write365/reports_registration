@@ -96,16 +96,6 @@ function course_detail($crn = null, $term = null)
         . '</div>';
 
     // Building header for table.
-    /*$header = array(
-        array('data' => 'Student ID', 'field' => 'student_id', 'sort' => 'desc'),
-        array('data' => 'ONID', 'field' => 'onid', 'sort' => 'desc',),
-        array('data' => 'Last Name', 'field' => 'last_name', 'sort' => 'desc',),
-        array('data' => 'First Name', 'field' => 'first_name', 'sort' => 'desc',),
-        array('data' => 'Email', 'field' => 'email', 'sort' => 'desc',),
-        array('data' => 'Status', 'field' => 'registration_status', 'sort' => 'desc',),
-        //array('data' => 'UID', 'field' => 'uid', 'sort' => 'desc',),
-        //array('data' => 'Name', 'field' => 'name', 'sort' => 'desc',),
-    );*/
 
     // Selecting all the students information that have regiesters for the class.
     // Getting class roster.
@@ -114,7 +104,7 @@ function course_detail($crn = null, $term = null)
         ->fields('u', array('uid', 'name'))
         ->condition('term', $course->term)
         ->condition('crn', $course->crn)
-        ->addTag('node_access')
+        /*->addTag('node_access')*/
         ->orderBy('s.last_name');
     $result->join('users', 'u', 's.onid = u.name');
 
@@ -146,7 +136,7 @@ function course_detail($crn = null, $term = null)
             ->condition('status', 1)
             ->condition('uid', $row->uid)
             ->condition('created', array($startUnix, $endUnix), 'BETWEEN')
-            ->addTag('node_access')
+            /*->addTag('node_access')*/
             ->addField('n', 'created', 'date');
 
         $result->join('wordsalad_score', 'w', 'w.nid = n.nid');
@@ -233,8 +223,8 @@ function student_detail($crn = null, $term = null, $uid = null)
         ->fields('u', array('uid'))
         ->condition('term', $term)
         ->condition('crn', $crn)
-        ->condition('uid', $uid)
-        ->addTag('node_access');
+        ->condition('uid', $uid);
+        /*->addTag('node_access');*/
 
     $result->join('OSU_Registration_Term_Validation', 't', 't.term_code = s.term');
     $result->join('users', 'u', 'u.name = s.onid');
