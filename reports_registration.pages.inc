@@ -97,7 +97,7 @@ function course_detail($crn = null, $term = null)
 
     // Building header for table.
 
-    // Selecting all the students information that have regiesters for the class.
+    // Selecting all the students information that have registered for the class.
     // Getting class roster.
     $result = db_select('OSU_Registration_Student_Input', 's');
     $result->fields('s', array('student_id', 'onid', 'last_name', 'first_name', 'email', 'registration_status'))
@@ -115,7 +115,7 @@ function course_detail($crn = null, $term = null)
     // Creating rows for table
     $rows = array();
 
-    // Creating variable that will all student inforamion for js to use
+    // Creating variable that will all student information for js to use
     $classInfo = array();
 
     // Creating form for each student
