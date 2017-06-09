@@ -35,18 +35,21 @@ function course_list()
     $result = $pager->execute(); // execute the result
     $rows[] = array();
 
+    $count = 0;
     foreach ($result as $row) { // add the data
 
-        $rows[$row->crn]['crn'] = '<a href="'
+        $rows[$count]['crn'] = '<a href="'
             . $GLOBALS['base_url']
             . '/reports_registration/instructor/course-detail/'
             . $row->crn . '/' . $row->term . '">
             <div class="btn btn-default">' . $row->crn . '</div>
         </a>';
-        $rows[$row->crn]['instructor_name'] = $row->instructor_name;
-        $rows[$row->crn]['course_name'] = $row->course_name;
-        $rows[$row->crn]['section_number'] = $row->section_number;
-        $rows[$row->crn]['term'] = $row->term;
+        $rows[$count]['instructor_name'] = $row->instructor_name;
+        $rows[$count]['course_name'] = $row->course_name;
+        $rows[$count]['section_number'] = $row->section_number;
+        $rows[$count]['term'] = $row->term;
+
+        $count++;
     }
 
     $build = "<p>The following are your courses registered with the Write 365 application (across all terms).</p>
@@ -374,18 +377,22 @@ function adm_courses_list()
     $result = $pager->execute(); // execute the result
     $rows[] = array();
 
+    $count = 0;
+
     foreach ($result as $row) { // add the data
 
-        $rows[$row->crn]['crn'] = '<a href="'
+        $rows[$count]['crn'] = '<a href="'
             . $GLOBALS['base_url']
             . '/reports_registration/administrator/adm-course-detail/'
             . $row->crn . '/' . $row->term . '">
             <div class="btn btn-default">' . $row->crn . '</div>
         </a>';
-        $rows[$row->crn]['instructor_name'] = $row->instructor_name;
-        $rows[$row->crn]['course_name'] = $row->course_name;
-        $rows[$row->crn]['section_number'] = $row->section_number;
-        $rows[$row->crn]['term'] = $row->term;
+        $rows[$count]['instructor_name'] = $row->instructor_name;
+        $rows[$count]['course_name'] = $row->course_name;
+        $rows[$count]['section_number'] = $row->section_number;
+        $rows[$count]['term'] = $row->term;
+
+        $count++;
     }
 
     $build = "<p>The following are your courses registered with the Write 365 application (across all terms).</p>
@@ -736,4 +743,3 @@ function adm_student_detail($crn = null, $term = null, $uid = null)
     return $build;
 
 }
-
